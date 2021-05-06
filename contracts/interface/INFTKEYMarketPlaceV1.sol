@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-pragma solidity =0.6.12;
-pragma experimental ABIEncoderV2;
+pragma solidity >=0.8.0;
+pragma abicoder v2;
 
 interface INFTKEYMarketPlaceV1 {
     struct Bid {
@@ -79,35 +79,7 @@ interface INFTKEYMarketPlaceV1 {
      */
     function getBidderTokenBid(uint256 tokenId, address bidder) external view returns (Bid memory);
 
-    /**
-     * @dev get all valid bids of a token
-     * @param tokenId erc721 token Id
-     * @return Valid bids of a token
-     */
-    function getTokenBids(uint256 tokenId) external view returns (Bid[] memory);
-
-    /**
-     * @dev get highest bid of a token
-     * @param tokenId erc721 token Id
-     * @return Valid highest bid or empty bid
-     */
-    function getTokenHighestBid(uint256 tokenId) external view returns (Bid memory);
-
-    /**
-     * @dev get current highest bids
-     * @param from index to start
-     * @param size size to query
-     * @return current highest bids
-     * This to help batch query when list gets big
-     */
-    function getTokenHighestBids(uint256 from, uint256 size) external view returns (Bid[] memory);
-
-    /**
-     * @dev get all highest bids
-     * @return All valid highest bids
-     */
-    function getAllTokenHighestBids() external view returns (Bid[] memory);
-
+ 
     /**
      * @dev List token for sale
      * @param tokenId erc721 token Id
@@ -163,22 +135,9 @@ interface INFTKEYMarketPlaceV1 {
      */
     function getInvalidListingCount() external view returns (uint256);
 
-    /**
-     * @dev Count how many bids records are invalid now
-     * This is to help admin to decide to do a cleaning or not
-     */
-    function getInvalidBidCount() external view returns (uint256);
 
     /**
-     * @dev Clean all invalid listings
-     */
-    function cleanAllInvalidListings() external;
-
-    /**
-     * @dev Clean all invalid bids
-     */
-    function cleanAllInvalidBids() external;
-
+   
     /**
      * @dev Name of ERC721 token
      */
