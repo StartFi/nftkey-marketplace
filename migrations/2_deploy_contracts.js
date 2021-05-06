@@ -1,22 +1,18 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const TestERC20 = artifacts.require("TestERC20");
-const TestERC721 = artifacts.require("TestERC721");
-const NFTKEYMarketPlaceV1_1 = artifacts.require("NFTKEYMarketPlaceV1_1");
-module.exports = async (deployer, network
+const startFiToken = artifacts.require("StartFiToken");
+const StartfiNFT = artifacts.require("StartfiNFT");
+const StartfiMarketPlace = artifacts.require("StartfiMarketPlace");
+module.exports = async (deployer, network,accounts
 // accounts: string[]
 ) => {
     console.log(network);
+    let tokenName="StartFiToken",symbol="STFI",initialSupply,owner =accounts[0];
+    
     if (network === "development") {
-        await deployer.deploy(TestERC721);
-        const erc721 = await TestERC721.deployed();
-        console.log(`TestERC721 deployed at ${erc721.address} in network: ${network}.`);
-        await deployer.deploy(TestERC20);
-        const erc20 = await TestERC20.deployed();
-        console.log(`TestERC20 deployed at ${erc20.address} in network: ${network}.`);
-        await deployer.deploy(NFTKEYMarketPlaceV1_1, "Test ERC721", erc721.address, erc20.address);
-        const marketplaceV1 = await NFTKEYMarketPlaceV1_1.deployed();
-        console.log(`NFTKEYMarketPlaceV1_1 deployed at ${marketplaceV1.address} in network: ${network}.`);
+        await deployer.deploy(startFiToken,tokenName,symbol,owner);
+         await deployer.deploy(StartfiNFT,tokenName,  symbol,   "http://ipfs.io");
+         console.log(`StartfiToken deployed at ${startFiToken.address} in network: ${network}.`);
+        await deployer.deploy(StartfiMarketPlace, "Test ERC721", StartfiNFT.address, startFiToken.address);
+         console.log(`StartfiMarketPlace deployed at ${StartfiMarketPlace.address} in network: ${network}.`);
     }
     if (network === "bsctestnet") {
         // await deployer.deploy(
@@ -31,11 +27,11 @@ module.exports = async (deployer, network
         // );
     }
     if (network === "bsc") {
-        await deployer.deploy(NFTKEYMarketPlaceV1_1, "NeuralPepe", "0x3c78B3066868C636c584a13Ec0a15b82e1E9511d", // NeuralPepe
-        "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c" // WBNB
-        );
-        const marketplaceV1 = await NFTKEYMarketPlaceV1_1.deployed();
-        console.log(`NFTKEYMarketPlaceV1_1 for NeuralPepe deployed at ${marketplaceV1.address} in network: ${network}.`);
+        // await deployer.deploy(NFTKEYMarketPlaceV1_1, "NeuralPepe", "0x3c78B3066868C636c584a13Ec0a15b82e1E9511d", // NeuralPepe
+        // "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c" // WBNB
+        // );
+        // const marketplaceV1 = await NFTKEYMarketPlaceV1_1.deployed();
+        // console.log(`NFTKEYMarketPlaceV1_1 for NeuralPepe deployed at ${marketplaceV1.address} in network: ${network}.`);
     }
     if (network === "ropsten") {
         // await deployer.deploy(

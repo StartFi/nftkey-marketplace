@@ -18,14 +18,14 @@
  *
  */
 
-const PrivateKeyProvider = require('@truffle/hdwallet-provider');
-const infuraKey = "9345aef065f34678aa3f5038145a4555";
-//
-const fs = require('fs');
-const privateKey = fs.readFileSync(".secret").toString().trim();
+// const PrivateKeyProvider = require('@truffle/hdwallet-provider');
+// const infuraKey = "9345aef065f34678aa3f5038145a4555";
+// //
+// const fs = require('fs');
+// const privateKey = fs.readFileSync(".secret").toString().trim();
 
 module.exports = {
-  contracts_build_directory: "../donito-dapp/src/contracts",
+  // contracts_build_directory: "../donito-dapp/src/contracts",
 
   /**
    * Networks define how you connect to your ethereum client and let you set the
@@ -49,7 +49,14 @@ module.exports = {
      host: "127.0.0.1",     // Localhost (default: none)
      port: 8545,            // Standard Ethereum port (default: none)
      network_id: "*",       // Any network (default: none)
-     gas: 9500000,
+    //  gas: 9500000,
+    },
+    dev: {
+     host: "http://208.87.128.217",     // Localhost (default: none)
+     port: 8545,            // Standard Ethereum port (default: none)
+     network_id: "*",       // Any network (default: none)
+    //  gas: 9500000,
+    
     },
     // Another network with more advanced options...
     // advanced: {
@@ -62,14 +69,14 @@ module.exports = {
     // },
     // Useful for deploying to a public network.
     // NB: It's important to wrap the provider as a function.
-    ropsten: {
-    provider: () =>  new PrivateKeyProvider(privateKey,  `https://ropsten.infura.io/v3/${infuraKey}`),
-    network_id: 3,       // Ropsten's id
-    gas: 5500000,        // Ropsten has a lower block limit than mainnet
-    confirmations: 2,    // # of confs to wait between deployments. (default: 0)
-    timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
-    skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
-    },
+    // ropsten: {
+    // provider: () =>  new PrivateKeyProvider(privateKey,  `https://ropsten.infura.io/v3/${infuraKey}`),
+    // network_id: 3,       // Ropsten's id
+    // gas: 5500000,        // Ropsten has a lower block limit than mainnet
+    // confirmations: 2,    // # of confs to wait between deployments. (default: 0)
+    // timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
+    // skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
+    // },
     // Useful for private networks
     // private: {
     // provider: () => new HDWalletProvider(mnemonic, `https://network.io`),
@@ -87,7 +94,7 @@ module.exports = {
   // Configure your compilers
   compilers: {
     solc: {
-      version: "0.6.2",    // Fetch exact version from solc-bin (default: truffle's version)
+      version: "0.8.0",    // Fetch exact version from solc-bin (default: truffle's version)
       docker: false,        // Use "0.5.1" you've installed locally with docker (default: false)
       settings: {          // See the solidity docs for advice about optimization and evmVersion
         optimizer: {
