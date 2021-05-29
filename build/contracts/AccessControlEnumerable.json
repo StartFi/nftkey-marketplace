@@ -4704,8 +4704,8 @@
     "version": "0.8.0+commit.c7dfd78e.Emscripten.clang"
   },
   "networks": {},
-  "schemaVersion": "3.4.0",
-  "updatedAt": "2021-05-22T17:53:19.520Z",
+  "schemaVersion": "3.4.1",
+  "updatedAt": "2021-05-29T11:29:42.568Z",
   "devdoc": {
     "details": "Extension of {AccessControl} that allows enumerating the members of each role.",
     "kind": "dev",
