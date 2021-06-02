@@ -28,16 +28,16 @@ contract StartfiMarketPlace is INFTKEYMarketPlaceV1, Ownable, ReentrancyGuard,ER
 
 
     constructor(
-        string memory erc721Name_,
+        string memory marketPlaceName_,
         address _erc721Address,
         address _paymentTokenAddress
     ) public {
-        _erc721Name = erc721Name_;
+        _marketPlaceName = marketPlaceName_;
         _erc721 = IERC721(_erc721Address);
         _paymentToken = IERC20(_paymentTokenAddress);
     }
 
-    string private _erc721Name;
+    string private _marketPlaceName;
     IERC721 private immutable _erc721;
     IERC20 private immutable _paymentToken;
 
@@ -287,30 +287,33 @@ contract StartfiMarketPlace is INFTKEYMarketPlaceV1, Ownable, ReentrancyGuard,ER
      * msg.sender must not the owner of token
      * token payment allowed must be at least sell price plus fees
      */
-    function buyToken(uint256 tokenId) external payable override nonReentrant {
-        Listing memory listing = getTokenListing(tokenId); // Get valid listing
-        require(listing.seller != address(0), "Token is not for sale"); // Listing not valid
-        require(!_isTokenOwner(tokenId, msg.sender), "Token owner can't buy their own token");
 
-        uint256 fees = listing.listingPrice.mul(_feeFraction).div(_feeBase);
-        require(
-             _paymentToken.allowance(msg.sender, address(this)) >= listing.listingPrice .add( fees),
-            "The value send is below sale price plus fees"
-        );
 
-        // Send value to token seller and fees to contract owner
-        uint256 valueWithoutFees =  _paymentToken.allowance(msg.sender, address(this)).sub(fees);
-        _paymentToken.safeTransferFrom( msg.sender,listing.seller, valueWithoutFees);
-        _paymentToken.safeTransferFrom( msg.sender, owner(), fees);
+     
+    // function buyToken(uint256 tokenId) external payable override nonReentrant {
+    //     Listing memory listing = getTokenListing(tokenId); // Get valid listing
+    //     require(listing.seller != address(0), "Token is not for sale"); // Listing not valid
+    //     require(!_isTokenOwner(tokenId, msg.sender), "Token owner can't buy their own token");
+
+    //     uint256 fees = listing.listingPrice.mul(_feeFraction).div(_feeBase);
+    //     require(
+    //          _paymentToken.allowance(msg.sender, address(this)) >= listing.listingPrice .add( fees),
+    //         "The value send is below sale price plus fees"
+    //     );
+
+    //     // Send value to token seller and fees to contract owner
+    //     uint256 valueWithoutFees =  _paymentToken.allowance(msg.sender, address(this)).sub(fees);
+    //     _paymentToken.safeTransferFrom( msg.sender,listing.seller, valueWithoutFees);
+    //     _paymentToken.safeTransferFrom( msg.sender, owner(), fees);
     
-        // Send token to buyer
-        emit TokenBought(tokenId, listing.seller, msg.sender, msg.value, valueWithoutFees, fees);
-        _erc721.safeTransferFrom(listing.seller, msg.sender, tokenId);
+    //     // Send token to buyer
+    //     emit TokenBought(tokenId, listing.seller, msg.sender, msg.value, valueWithoutFees, fees);
+    //     _erc721.safeTransferFrom(listing.seller, msg.sender, tokenId);
 
-        // Remove token listing
-        _delistToken(tokenId);
-        _removeBidOfBidder(tokenId, msg.sender);
-    }
+    //     // Remove token listing
+    //     _delistToken(tokenId);
+    //     _removeBidOfBidder(tokenId, msg.sender);
+    // }
 
     /**
      * @dev See {INFTKEYMarketPlaceV1-enterBidForToken}.
@@ -418,10 +421,10 @@ contract StartfiMarketPlace is INFTKEYMarketPlaceV1, Ownable, ReentrancyGuard,ER
    
 
     /**
-     * @dev See {INFTKEYMarketPlaceV1-erc721Name}.
+     * @dev See {INFTKEYMarketPlaceV1-marketPlaceName}.
      */
-    function erc721Name() external view override returns (string memory) {
-        return _erc721Name;
+    function marketPlaceName() external view override returns (string memory) {
+        return _marketPlaceName;
     }
 
     /**
