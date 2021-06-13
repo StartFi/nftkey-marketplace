@@ -97,13 +97,13 @@ interface INFTKEYMarketPlaceV1 {
      * @param tokenId erc721 token Id
      */
     function delistToken(uint256 tokenId) external;
-
+/* 
     /**
      * @dev Buy token
      * @param tokenId erc721 token Id
      */
-    function buyToken(uint256 tokenId) external payable;
-
+  //  function buyToken(uint256 tokenId) external payable;
+ 
     /**
      * @dev Enter bid for token
      * @param tokenId erc721 token Id
@@ -141,7 +141,7 @@ interface INFTKEYMarketPlaceV1 {
     /**
      * @dev Name of ERC721 token
      */
-    function erc721Name() external view returns (string memory);
+    function marketPlaceName() external view returns (string memory);
 
     /**
      * @dev Show if listing and bid are enabled
@@ -164,3 +164,4 @@ interface INFTKEYMarketPlaceV1 {
      */
     function serviceFee() external view returns (uint8, uint8);
 }
+ 
