@@ -1,5 +1,5 @@
 /node_modules
-.secret
+*.secret
 # Logs
 logs
 *.log
