@@ -1,3 +1,7 @@
+const HDWalletProvider = require("@truffle/hdwallet-provider");
+const fs = require('fs');
+const privateKey = fs.readFileSync("privateKey.secret").toString().trim();
+const alchemyKey = fs.readFileSync("alchemyKey.secret").toString().trim();
 /**
  * Use this file to configure your truffle project. It's seeded with some
  * common settings for different networks and features like migrations,
@@ -38,7 +42,6 @@ module.exports = {
    */
 
   networks: {
-
     // Useful for testing. The `development` name is special - truffle uses it by default
     // if it's defined here and no other network is specified at the command line.
     // You should run a client (like ganache-cli, geth or parity) in a separate terminal
@@ -46,18 +49,30 @@ module.exports = {
     // options below to some value.
     //
     development: {
-     host: "127.0.0.1",     // Localhost (default: none)
-     port: 8545,            // Standard Ethereum port (default: none)
-     network_id: "*",       // Any network (default: none)
-    //  gas: 9500000,
+      host: "127.0.0.1", // Localhost (default: none)
+      port: 8545, // Standard Ethereum port (default: none)
+      network_id: "*", // Any network (default: none)
+      //  gas: 9500000,
     },
     dev: {
-     host: "http://208.87.128.217",     // Localhost (default: none)
-     port: 8545,            // Standard Ethereum port (default: none)
-     network_id: "*",       // Any network (default: none)
-    //  gas: 9500000,
-    
+      host: "http://208.87.128.217", // Localhost (default: none)
+      port: 8545, // Standard Ethereum port (default: none)
+      network_id: "*", // Any network (default: none)
+      //  gas: 9500000,
     },
+    ropsten: {
+      provider: new HDWalletProvider({
+        privateKeys: [privateKey],
+        providerOrUrl: `https://eth-ropsten.alchemyapi.io/v2/${alchemyKey}`,
+        ////////////////////////////
+        chainId: 3 // add this
+      }
+      ),
+      network_id: "3",
+    },
+
+
+
     // Another network with more advanced options...
     // advanced: {
     // port: 8777,             // Custom port
@@ -88,21 +103,22 @@ module.exports = {
   // Set default mocha options here, use special reporters etc.
   mocha: {
     enableTimeouts: false,
-    before_timeout: 220000 // Here is 2min but can be whatever timeout is suitable for you.
-},
+    before_timeout: 220000, // Here is 2min but can be whatever timeout is suitable for you.
+  },
 
   // Configure your compilers
   compilers: {
     solc: {
-      version: "0.8.0",    // Fetch exact version from solc-bin (default: truffle's version)
-      docker: false,        // Use "0.5.1" you've installed locally with docker (default: false)
-      settings: {          // See the solidity docs for advice about optimization and evmVersion
+      version: "0.8.0", // Fetch exact version from solc-bin (default: truffle's version)
+      docker: false, // Use "0.5.1" you've installed locally with docker (default: false)
+      settings: {
+        // See the solidity docs for advice about optimization and evmVersion
         optimizer: {
           enabled: true,
-          runs: 999999
+          runs: 999999,
         },
-        evmVersion: "istanbul"
-      }
-    }
-  }
+        evmVersion: "istanbul",
+      },
+    },
+  },
 };

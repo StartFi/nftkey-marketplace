@@ -1,18 +1,28 @@
 const startFiToken = artifacts.require("StartFiToken");
 const StartfiNFT = artifacts.require("StartfiNFT");
 const StartfiMarketPlace = artifacts.require("StartfiMarketPlace");
-module.exports = async (deployer, network,accounts
-// accounts: string[]
+const StartfiRoyaltyNFT = artifacts.require("StartfiRoyaltyNFT")
+module.exports = async (deployer, network, accounts
+    // accounts: string[]
 ) => {
     console.log(network);
-    let tokenName="StartFiToken",symbol="STFI",initialSupply,owner =accounts[0];
-    
-    if (network === "development") {
-        await deployer.deploy(startFiToken,tokenName,symbol,owner);
-         await deployer.deploy(StartfiNFT,tokenName,  symbol,   "http://ipfs.io");
-         console.log(`StartfiToken deployed at ${startFiToken.address} in network: ${network}.`);
+    if (network === "ropsten-fork") {
+        let tokenName = "StartFiToken", symbol = "STFI", initialSupply, owner = accounts[0];
+        await deployer.deploy(startFiToken, tokenName, symbol, owner);
+        await deployer.deploy(StartfiNFT, tokenName, symbol, "http://ipfs.io");
+        console.log(`StartfiToken deployed at ${startFiToken.address} in network: ${network}.`);
         await deployer.deploy(StartfiMarketPlace, "Test ERC721", StartfiNFT.address, startFiToken.address);
-         console.log(`StartfiMarketPlace deployed at ${StartfiMarketPlace.address} in network: ${network}.`);
+        console.log(`StartfiMarketPlace deployed at ${StartfiMarketPlace.address} in network: ${network}.`);
+        await deployer.deploy(StartfiRoyaltyNFT, tokenName, symbol, "http://ipfs.io")
+    }
+
+    if (network === "development") {
+        await deployer.deploy(startFiToken, tokenName, symbol, owner);
+        await deployer.deploy(StartfiNFT, tokenName, symbol, "http://ipfs.io");
+        console.log(`StartfiToken deployed at ${startFiToken.address} in network: ${network}.`);
+        await deployer.deploy(StartfiMarketPlace, "Test ERC721", StartfiNFT.address, startFiToken.address);
+        console.log(`StartfiMarketPlace deployed at ${StartfiMarketPlace.address} in network: ${network}.`);
+        await deployer.deploy(StartfiRoyaltyNFT, tokenName, symbol, "http://ipfs.io")
     }
     if (network === "bsctestnet") {
         // await deployer.deploy(
