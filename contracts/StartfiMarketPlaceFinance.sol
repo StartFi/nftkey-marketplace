@@ -18,6 +18,7 @@ contract StartfiMarketPlaceFinance is MarketPlaceBase {
     uint256 public delistFeesPercentage=1;
     uint256 public listqualifyPercentage=1;
    mapping (address=>uint256) userReserves;
+   mapping (address=>bytes32[]) userListing;
    address public stakeContract;
  /******************************************* constructor goes here ********************************************************* */
 
@@ -37,8 +38,8 @@ contract StartfiMarketPlaceFinance is MarketPlaceBase {
 
   /******************************************* read state functions go here ********************************************************* */
     
-    function _clacReleaseTime(uint256 startTime, uint256 duration) pure internal returns (uint256 releaseTime) {
-        releaseTime= startTime.add(duration);        
+    function _calcSum(uint256 a, uint256 b) pure internal returns (uint256 result) {
+        result= a.add(b);        
     }
     function _calcFees(uint256 bidPrice) view internal returns (uint256 fees) {
         fees= bidPrice.mul(_feeFraction).div(_feeBase + _feeFraction);    
@@ -76,6 +77,9 @@ contract StartfiMarketPlaceFinance is MarketPlaceBase {
         // user can bid multi time, we want to make sure we don't calc the old bid as sperated bid 
         uint256 userActualReserved= userReserves[user].sub(prevAmount);
         return IStartFiStakes(stakeContract).getReserves( user).sub(userActualReserved);
+    }
+    function _deduct(address finePayer, address to, uint256 amount)  internal returns (bool ) {
+          return IStartFiStakes(stakeContract).deduct(finePayer, to, amount);
     }
 
       /******************************************* state functions go here ********************************************************* */

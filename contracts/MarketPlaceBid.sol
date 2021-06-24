@@ -30,6 +30,7 @@ contract MarketPlaceBid  {
   mapping (bytes32=>WinningBid) internal bidToListing;
 
 
+ /******************************************* read state functions go here ********************************************************* */
 
 // bid 
 function _bid(bytes32 bidId , bytes32 listingId, address tokenAddress,address bidder, uint256 tokenId, uint256 bidPrice) internal  returns(    bool){

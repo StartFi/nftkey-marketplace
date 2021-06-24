@@ -56,7 +56,7 @@ modifier isNotZero(uint256 val) {
     function ListOnMarketplace( address nftAddress,
           uint256 tokenId,
             uint256 listingPrice, uint256 qualifyAmount) external isNotZero(listingPrice) returns (bytes32 listId) {
-            uint256 releaseTime = _clacReleaseTime(block.timestamp,delistAfter);
+            uint256 releaseTime = _calcSum(block.timestamp,delistAfter);
             listId = keccak256(abi.encodePacked(nftAddress,tokenId,_msgSender(),releaseTime));
             // calc qualified ammount
             uint256 listQualifyAmount =_getListingQualAmount(listingPrice);
@@ -70,6 +70,9 @@ modifier isNotZero(uint256 val) {
 
           // update reserved
             _updateUserReserves(_msgSender() ,listQualifyAmount,true);
+            bytes32 [] listings = userListing[_msgSender()];
+            listings.push(listId);
+            userListing[_msgSender()]=listings;
           // list 
           require(_listOnMarketPlace( listId,nftAddress,_msgSender(),tokenId,listingPrice,releaseTime,qualifyAmount) ,"Couldn't list the item");
 
@@ -85,7 +88,7 @@ modifier isNotZero(uint256 val) {
             uint256 duration
             ) external isNotZero(listingPrice) returns (bytes32 listId) {
               require(duration>12 hours,"Auction should be live for more than 12 hours");
-            uint256 releaseTime = _clacReleaseTime(block.timestamp,duration);
+            uint256 releaseTime = _calcSum(block.timestamp,duration);
             listId = keccak256(abi.encodePacked(nftAddress,tokenId,_msgSender(),releaseTime));
             if(sellForEnabled){
               require(sellFor>0,"Zero price is not allowed");
@@ -122,7 +125,9 @@ modifier isNotZero(uint256 val) {
        if(prevAmount==0){
                   // check that he has reserved
          require(_getStakeAllowance(_msgSender(), 0)>= qualifyAmount,"Not enough reserves");
-       
+          bytes32 [] listings = userListing[_msgSender()];
+            listings.push(listingId);
+            userListing[_msgSender()]=listings;
          // update user reserves
          // reserve Zero couldn't be at any case
         require( _updateUserReserves(_msgSender() ,qualifyAmount,true)>0,"Reserve Zero is not allowed");
@@ -189,6 +194,7 @@ modifier isNotZero(uint256 val) {
           // if it's not auction ? pay, 
          ( fineAmount ,  remaining)= _getDeListingQualAmount(listingPrice);
               //TODO: deduct the fine from his stake contract 
+               require(_deduct(owner, owner(), fineAmount),"couldn'r deduct the fine");
         }else{
        remaining=  _getListingQualAmount( listingPrice);
         }
@@ -229,7 +235,10 @@ modifier isNotZero(uint256 val) {
         require(_safeTokenTransferFrom(_msgSender(),buyer, netPrice),"Couldn't transfer token to buyer");
           // trnasfer token
         require( _safeNFTTransfer(contractAddress,tokenId,address(this), _msgSender()),"NFT token couldn't be transfered");
-    
+           uint256 ListingQualAmount =  _getListingQualAmount( listingPrice);
+
+            require( _updateUserReserves(buyer ,ListingQualAmount,false)>=0,"negative reserve is not allowed");
+
         // finish listing 
         _finalizeListing(listingId,_msgSender(), ListingStatus.Sold);
         // if bid time is less than 15 min, increase by 15 min
@@ -257,5 +266,26 @@ modifier isNotZero(uint256 val) {
          _finalizeListing(listingId,address(0),ListingStatus.Canceled);
         // if bid time is less than 15 min, increase by 15 min
         // retuen bid id
+    }
+    function freeReserves() external returns (uint256 curentReserves) {
+      // TODo: free unused reserves
+      // iterate over the listng key map 
+      // if it's sold, canceled,  free if he is participating on this listing
+            bytes32 [] listings = userListing[_msgSender()];
+            bytes32 [] newListings;
+            uint256 curentReserves;
+
+            // loop
+        for (uint256 index = 0; index < listings.length; index++) {
+        if( _tokenListings[ listings[index]].status==ListingStatus.onAuction
+              ||  _tokenListings[ listings[index]].status==ListingStatus.OnMarket){
+              newListings.push(listings[index]);
+              curentReserves = _calcSum(curentReserves,_tokenListings[ listings[index]].qualifyAmount);
+
+        }
+        }       
+       userListing[_msgSender()]=newListings;
+      require( _setUserReserves(_msgSender() ,curentReserves),"set reserve faild");
+
     }
 }
