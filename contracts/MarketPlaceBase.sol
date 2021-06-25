@@ -3,10 +3,9 @@
 pragma solidity >=0.8.0;
 pragma abicoder v2;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "./interface/IERC721Royalty.sol";
 
 /**
  * @author Eman Herawy StartFi Team
@@ -14,29 +13,79 @@ import "@openzeppelin/contracts/security/Pausable.sol";
  * Note: This marketplace contract is collection based. It serves one ERC721 contract only
  * Payment tokens usually is the chain native coin's wrapped token, e.g. WETH, WBNB
  */
-contract MarketPlaceBase is  Ownable,ERC721Holder,Pausable {
+contract MarketPlaceBase is  ERC721Holder {
+    /******************************************* decalrations go here ********************************************************* */
+
+    string private _marketPlaceName;
+    bytes4   RORALTY_INTERFACE= 0x2a55205a;
+ /******************************************* constructor goes here ********************************************************* */
+
     constructor(
-        string memory marketPlaceName_,
-        
-        address _paymentTokenAddress
-    ) public {
-        _marketPlaceName = marketPlaceName_;
+        string memory _name 
+    )  {
+        _marketPlaceName = _name;
        
-        _paymentToken = IERC20(_paymentTokenAddress);
+         
     }
 
-    string internal _marketPlaceName;
-     IERC20 internal immutable _paymentToken;
-    uint8 internal _feeFraction = 1;
-    uint8 internal _feeBase = 100;
-      /// @param newFees  the new fees value to be stored 
-    /// @return the value of the state variable `_feeFraction`
-     function changeFees(uint8 newFees) public onlyOwner whenPaused returns (uint8) {
-         // fees is a value between 1-3 %
-         require(newFees>=1 && newFees<=3,"fees invalid range");
-         _feeFraction=newFees;
-         return _feeFraction;
+ /******************************************* read state functions go here ********************************************************* */
+ function _supportRoyalty(address contractAddress) view internal  returns (bool) {
+       try IERC721(contractAddress).supportsInterface(RORALTY_INTERFACE) returns (bool isRoyaltySupported) {
+            return isRoyaltySupported;
+        } catch {
+            return false;
+        }
+ }
+ function _getRoyaltyInfo(address contractAddress, uint256 _tokenId, uint256 _value) view internal  returns (address issuer, uint256 _royaltyAmount) {
+       (issuer, _royaltyAmount) =IERC721Royalty(contractAddress).royaltyInfo( _tokenId,   _value) ;
+ }
+    /**
+     * @return market place name
+     */
+    function marketPlaceName() external view returns (string memory) {
+        return _marketPlaceName;
+    }
+    /**
+     * @dev check if the account is the owner of this erc721 token
+     */
+    function tokenOwner(address contractAddress, uint256 tokenId) internal view returns (address) {
+       return IERC721(contractAddress).ownerOf(tokenId) ;
+    }
+
+    /**
+     * @dev check if this contract has approved to transfer this erc721 token
+     */
+    function _isTokenApproved(address contractAddress, uint256 tokenId) internal view returns (bool) {
+        try IERC721(contractAddress).getApproved(tokenId) returns (address tokenOperator) {
+            return tokenOperator == address(this);
+        } catch {
+            return false;
+        }
+      
+    }
+
+    /**
+     * @dev check if this contract has approved to all of this owner's erc721 tokens
+     */
+    function _isAllTokenApproved(address contractAddress,address owner) internal view returns (bool) {
+        return IERC721(contractAddress).isApprovedForAll(owner, address(this));
+    }  
+
+      /******************************************* state functions go here ********************************************************* */
+
+      /// @param _name  the new name to be stored 
+     function _changeMarketPlaceName(string memory _name)internal {
+      _marketPlaceName=_name;  
      }
+  
+    
+    function _safeNFTTransfer(address contractAddress, uint256 tokenId, address from, address to) internal returns (bool) {
+       IERC721(contractAddress). safeTransferFrom( from,  to,  tokenId);
+       return true;
+    }
+
+
+
 }  
 
    

@@ -28,7 +28,7 @@ function royaltyInfo(uint256 _tokenId, uint256 _value) external view  override r
     }
 }
 // 0x2a55205a
-    function supportsRoyalty() public view  returns (bytes4 interfaceId) {
+    function supportsRoyalty() public pure  returns (bytes4 interfaceId) {
         return  type(IERC721Royalty).interfaceId;
     }
 
