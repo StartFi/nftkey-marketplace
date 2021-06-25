@@ -21,13 +21,6 @@ const alchemyKey = fs.readFileSync("alchemyKey.secret").toString().trim();
  * phrase from a file you've .gitignored so it doesn't accidentally become public.
  *
  */
-
-const PrivateKeyProvider = require('@truffle/hdwallet-provider');
-// const infuraKey = "9345aef065f34678aa3f5038145a4555";
-// //
-const fs = require('fs');
-const privateKey = fs.readFileSync(".secret").toString().trim();
-
 module.exports = {
   // contracts_build_directory: "../donito-dapp/src/contracts",
 

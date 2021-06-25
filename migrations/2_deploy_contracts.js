@@ -14,7 +14,7 @@ module.exports = async (deployer, network,accounts
         console.log(`StartfiToken deployed at ${startFiToken.address} in network: ${network}.`);
         await deployer.deploy(StartfiMarketPlace, "Test ERC721", StartfiNFT.address, startFiToken.address);
         console.log(`StartfiMarketPlace deployed at ${StartfiMarketPlace.address} in network: ${network}.`);
-        await deployer.deploy(StartfiRoyaltyNFT, tokenName, symbol, "http://ipfs.io")
+        await deployer.deploy(StartfiNFT, tokenName, symbol, "http://ipfs.io")
     }
 
     if (network === "development") {
