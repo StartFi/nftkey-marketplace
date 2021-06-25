@@ -18,11 +18,11 @@
  *
  */
 
-// const PrivateKeyProvider = require('@truffle/hdwallet-provider');
+const PrivateKeyProvider = require('@truffle/hdwallet-provider');
 // const infuraKey = "9345aef065f34678aa3f5038145a4555";
 // //
-// const fs = require('fs');
-// const privateKey = fs.readFileSync(".secret").toString().trim();
+const fs = require('fs');
+const privateKey = fs.readFileSync(".secret").toString().trim();
 
 module.exports = {
   // contracts_build_directory: "../donito-dapp/src/contracts",
@@ -57,6 +57,20 @@ module.exports = {
      network_id: "*",       // Any network (default: none)
     //  gas: 9500000,
     
+    },
+         testnet: {
+      provider: () => new HDWalletProvider(privateKey, `https://data-seed-prebsc-1-s1.binance.org:8545`),
+      network_id: 97,
+      confirmations: 10,
+      timeoutBlocks: 200,
+      skipDryRun: true
+    },
+    bsc: {
+      provider: () => new HDWalletProvider(privateKey, `https://bsc-dataseed1.binance.org`),
+      network_id: 56,
+      confirmations: 10,
+      timeoutBlocks: 200,
+      skipDryRun: true
     },
     // Another network with more advanced options...
     // advanced: {
