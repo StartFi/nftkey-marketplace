@@ -70,7 +70,7 @@ modifier isNotZero(uint256 val) {
 
           // update reserved
             _updateUserReserves(_msgSender() ,listQualifyAmount,true);
-            bytes32 [] listings = userListing[_msgSender()];
+            bytes32  [] storage listings = userListing[_msgSender()];
             listings.push(listId);
             userListing[_msgSender()]=listings;
           // list 
@@ -125,7 +125,7 @@ modifier isNotZero(uint256 val) {
        if(prevAmount==0){
                   // check that he has reserved
          require(_getStakeAllowance(_msgSender(), 0)>= qualifyAmount,"Not enough reserves");
-          bytes32 [] listings = userListing[_msgSender()];
+          bytes32 [] storage listings = userListing[_msgSender()];
             listings.push(listingId);
             userListing[_msgSender()]=listings;
          // update user reserves
@@ -194,7 +194,7 @@ modifier isNotZero(uint256 val) {
           // if it's not auction ? pay, 
          ( fineAmount ,  remaining)= _getDeListingQualAmount(listingPrice);
               //TODO: deduct the fine from his stake contract 
-               require(_deduct(owner, owner(), fineAmount),"couldn'r deduct the fine");
+               require(_deduct(owner, address(0) /*owner()*/, fineAmount),"couldn't deduct the fine");
         }else{
        remaining=  _getListingQualAmount( listingPrice);
         }
@@ -235,7 +235,7 @@ modifier isNotZero(uint256 val) {
         require(_safeTokenTransferFrom(_msgSender(),buyer, netPrice),"Couldn't transfer token to buyer");
           // trnasfer token
         require( _safeNFTTransfer(contractAddress,tokenId,address(this), _msgSender()),"NFT token couldn't be transfered");
-           uint256 ListingQualAmount =  _getListingQualAmount( listingPrice);
+           uint256 ListingQualAmount =  _getListingQualAmount( _tokenListings[listingId]. listingPrice);
 
             require( _updateUserReserves(buyer ,ListingQualAmount,false)>=0,"negative reserve is not allowed");
 
@@ -268,12 +268,14 @@ modifier isNotZero(uint256 val) {
         // retuen bid id
     }
     function freeReserves() external returns (uint256 curentReserves) {
-      // TODo: free unused reserves
+      // TODo: Check allternative for gas consumptions
       // iterate over the listng key map 
       // if it's sold, canceled,  free if he is participating on this listing
-            bytes32 [] listings = userListing[_msgSender()];
-            bytes32 [] newListings;
-            uint256 curentReserves;
+
+            bytes32 [] memory listings = userListing[_msgSender()];
+            delete userListing[_msgSender()];
+            bytes32 [] storage newListings = userListing[_msgSender()]  ;
+             
 
             // loop
         for (uint256 index = 0; index < listings.length; index++) {
@@ -284,7 +286,7 @@ modifier isNotZero(uint256 val) {
 
         }
         }       
-       userListing[_msgSender()]=newListings;
+      userListing[_msgSender()]=newListings;
       require( _setUserReserves(_msgSender() ,curentReserves),"set reserve faild");
 
     }
