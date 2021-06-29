@@ -4,7 +4,7 @@ pragma solidity >=0.8.0;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./interface/IERC721Royalty.sol";
 
-contract ERC721Rolyalty is IERC721Royalty {
+contract ERC721Royalty is IERC721Royalty {
     using SafeMath for uint256;
     mapping (uint256 => address) internal _issuer;
     mapping (uint256 => mapping (address=>Base) ) internal _issuerPercentage;
@@ -28,8 +28,8 @@ function royaltyInfo(uint256 _tokenId, uint256 _value) external view  override r
     }
 }
 // 0x2a55205a
-    function supportsInterface(bytes4 interfaceId) public view virtual  returns (bool) {
-        return interfaceId == type(IERC721Royalty).interfaceId;
+    function supportsRoyalty() public pure  returns (bytes4 interfaceId) {
+        return  type(IERC721Royalty).interfaceId;
     }
 
 }

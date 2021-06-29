@@ -1,19 +1,43 @@
 const startFiToken = artifacts.require("StartFiToken");
-const StartfiNFT = artifacts.require("StartfiNFT");
-const StartfiMarketPlace = artifacts.require("StartfiMarketPlace");
+const StartFiNFTPayment = artifacts.require("StartFiNFTPayment");
+const StartfiNFT = artifacts.require("StartfiRoyaltyNFT");
+const StartfiStakes = artifacts.require("StartfiStakes");
+const StartfiMarketPlace = artifacts.require("StartFiMarketPlace");
 module.exports = async (deployer, network,accounts
 // accounts: string[]
 ) => {
     console.log(network);
-    let tokenName="StartFiToken",symbol="STFI",initialSupply,owner =accounts[0];
-    
+    if (network === "ropsten-fork") {
+        let tokenName = "StartFiToken", symbol = "STFI", initialSupply, owner = accounts[0];
+        await deployer.deploy(startFiToken, tokenName, symbol, owner);
+        await deployer.deploy(StartfiNFT, tokenName, symbol, "http://ipfs.io");
+        console.log(`StartfiToken deployed at ${startFiToken.address} in network: ${network}.`);
+        await deployer.deploy(StartfiMarketPlace, "Test ERC721", StartfiNFT.address, startFiToken.address);
+        console.log(`StartfiMarketPlace deployed at ${StartfiMarketPlace.address} in network: ${network}.`);
+        await deployer.deploy(StartfiNFT, tokenName, symbol, "http://ipfs.io")
+    }
+
     if (network === "development") {
         await deployer.deploy(startFiToken,tokenName,symbol,owner);
          await deployer.deploy(StartfiNFT,tokenName,  symbol,   "http://ipfs.io");
          console.log(`StartfiToken deployed at ${startFiToken.address} in network: ${network}.`);
-        await deployer.deploy(StartfiMarketPlace, "Test ERC721", StartfiNFT.address, startFiToken.address);
+         const rNFT= await StartfiNFT.deployed();
+          const isERC721 = await rNFT.supportsInterface("0x01ffc9a7");
+         console.log(isERC721,'isERC721 ');
+         const isERCRoyalty = await rNFT.supportsInterface("0x2a55205a");
+         console.log(isERCRoyalty,'isERCRoyalty');
+         
+        await deployer.deploy(StartfiStakes, startFiToken.address);
+
+        await deployer.deploy(StartFiNFTPayment, StartfiNFT.address, startFiToken.address);
+        // add to minter role 
+        await rNFT.grantRole("0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6",StartFiNFTPayment.address)
+        await deployer.deploy(StartfiMarketPlace, "Test ERC721",  startFiToken.address,StartfiStakes.address,);
          console.log(`StartfiMarketPlace deployed at ${StartfiMarketPlace.address} in network: ${network}.`);
-    }
+            const staker = await StartfiStakes.deployed();
+            await staker.setMarketplace(StartfiMarketPlace.address);
+  
+        }
     if (network === "bsctestnet") {
         // await deployer.deploy(
         //   NFTKEYMarketPlaceV1_1,
